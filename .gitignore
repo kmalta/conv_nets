@@ -2,4 +2,7 @@
 *.pyc
 
 #ignore mnist data
-mnist*
+mnist
+
+#ignore DL virtual env
+dl-virtenv

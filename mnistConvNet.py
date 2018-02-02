@@ -1,11 +1,12 @@
 import tensorflow as tf
 import pickle as pkl
 import numpy as np
+import gzip
 print("Tensorflow version " + tf.__version__)
 tf.set_random_seed(0)
 
-with open("../data/mnist.pkl", "r") as f:
-    train, val, test = pkl.load(f)
+with gzip.open("mnist/mnist.pkl.gz", "r") as f:
+    train, val, test = pkl.load(f, encoding="latin1")
 
 def one_hot(n, val):
     ret = np.zeros(n)
@@ -79,20 +80,18 @@ TRAIN_STEPS = 5000
 
 train_x = train[0]
 train_y = train[1]
-indices_range = range(len(train_x))
-for i in xrange(TRAIN_STEPS):
-    batch_inds = np.random.choice(indices_range, 100, replace=False)
+for i in range(TRAIN_STEPS):
+    batch_inds = np.random.choice(range(len(train_x)), 100, replace=False)
     batch_X, batch_Y = data_reshape(train_x[batch_inds], train_y[batch_inds])
     _, loss = sess.run([train_step, cross_entropy], feed_dict={X: batch_X, Y: batch_Y, lr: .001})
 
-    print "after training step {}, we have a loss of {}".format(i, loss)
+    print("after training step {}, we have a loss of {}".format(i, loss))
 
 test_X, test_Y = data_reshape(test[0], test[1])
 predictions = sess.run(Y_hat, feed_dict={X: test_X, Y: test_Y, lr: .001})
 predictions = [np.argmax(p) for p in predictions]
 
-pairs = zip(predictions, test[1])
-correct = np.sum([p[0] == p[1] for p in pairs])
-wrong = len(pairs) - correct
-mcerror = float(correct) / len(pairs)
-print "We classify {} correctly and {} incorrectly giving us an accuracy of {}".format(correct, wrong, mcerror)
+correct = np.sum([p[0] == p[1] for p in zip(predictions, test[1])])
+wrong = len(predictions) - correct
+mcerror = float(correct) / len(predictions)
+print("We classify {} correctly and {} incorrectly giving us an accuracy of {}".format(correct, wrong, mcerror))
