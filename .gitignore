@@ -2,7 +2,7 @@
 *.pyc
 
 #ignore mnist data
-mnist
+*mnist.pkl.gz
 
 #ignore DL virtual env
 dl-virtenv
